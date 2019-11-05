@@ -105,3 +105,16 @@ func (h *handler) Do(msg []byte) error {
 }
 ```
 
+### Consumer OnError
+
+OnError event will be trigger when `Do()` return error object. In order to register on error event you just implement `OnError` method.
+
+```sh
+func (h *handler) OnError(m amqp.Delivery, err error) {
+	log.Panic("business process error")
+}
+```
+
+### Consumer with Dead-Letter-Queue
+
+Dead-Letter-Queue also know retry mechanism.

@@ -48,6 +48,7 @@ func newConsumerHandler() rabbitmq.ConsumerHandler {
 func (h *handler) Do(msg []byte) error {
 	fmt.Println(string(msg))
 
+	// return errors.New("error occurs")
 	return nil
 }
 
@@ -58,5 +59,5 @@ func (h *handler) OnSuccess(m amqp.Delivery) error {
 }
 
 func (h *handler) OnError(m amqp.Delivery, err error) {
-
+	log.Panic("business process error")
 }
