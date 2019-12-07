@@ -49,7 +49,7 @@ type ConsumerConfigDLQHandler func(*ConsumerDLQ) error
 type Consume struct {
 	conn Connection
 
-	queueName    string
+	queueName string
 
 	// The consumer is identified by a string that is unique and scoped for all
 	// consumers on this channel.
@@ -58,23 +58,23 @@ type Consume struct {
 	// When autoAck (also known as noAck) is true, the server will acknowledge
 	// deliveries to this consumer prior to writing the delivery to the network.  When
 	// autoAck is true, the consumer should not call Delivery.Ack
-	autoAck      bool
+	autoAck bool
 
 	// Check Queue struct documentation
-	exclusive    bool
+	exclusive bool
 
 	// When noLocal is true, the server will not deliver publishing sent from the same
 	// connection to this consumer. (Do not use Publish and Consume from same channel)
-	noLocal      bool
+	noLocal bool
 
 	// Check Queue struct documentation
-	noWait       bool
+	noWait bool
 
 	// Check Exchange comments for Args
-	args         amqp.Table
+	args amqp.Table
 
-	msg chan *amqp.Delivery
-	handlers []ConsumerHandler
+	msg           chan *amqp.Delivery
+	handlers      []ConsumerHandler
 	requiredRetry bool
 	*ConsumerDLQ
 }
@@ -155,7 +155,7 @@ func (c *Consume) Consume() error {
 				}
 			}
 
-			m.Ack(false)
+			// m.Ack(false)
 		}
 	}()
 
