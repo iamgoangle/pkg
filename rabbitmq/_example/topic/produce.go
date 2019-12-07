@@ -6,12 +6,6 @@ import (
 	rabbitmq "github.com/iamgoangle/pkg/rabbitmq"
 )
 
-const (
-	exchangeName = "exc_fanout"
-
-	queueName = "q_fanout"
-)
-
 func main() {
 	conf := rabbitmq.Config{
 		Host:     "localhost",
@@ -25,7 +19,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	producer := rabbitmq.NewProducer(exchangeName, "", "", connection)
+	producer := rabbitmq.NewProducer("exc_topic", "campaign.multicast.fast", "", connection)
 	err = producer.Publish([]byte(`{"Name":"Alice","Body":"Hello","Time":1294706395881547000}`))
 	if err != nil {
 		log.Println("unable to publish body")
