@@ -16,9 +16,6 @@ import (
 // provides Do() for client business logic
 // and OnError() for handle in case of consume error
 type ConsumerHandler interface {
-	// OnDelay handles delay queue event
-	OnDelay(m amqp.Delivery) error
-
 	// Do handles execute main business logic
 	Do(msg []byte) error
 
@@ -150,10 +147,6 @@ func (c *Consume) Consume() error {
 			}
 
 			for _, h := range c.handlers {
-				if err := h.OnDelay(m); err != nil {
-					break
-				}
-
 				err := h.Do(m.Body)
 				if err != nil {
 					h.OnError(m, err)

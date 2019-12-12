@@ -37,17 +37,19 @@ func main() {
 
 	// main exchange and queue
 	connection.Use(middlewares.ExchangeDeclare(exchangeName, middlewares.ExchangeDirect, nil))
-	connection.Use(middlewares.QueueDeclare(queueName, nil))
+	argsDelayQueue := make(amqp.Table)
+	argsDelayQueue["x-dead-letter-exchange"] = exchangeDelayName
+	connection.Use(middlewares.QueueDeclare(queueName, argsDelayQueue))
 	connection.Use(middlewares.QueueBind(queueName, "", exchangeName, false, nil))
 	if err := connection.Run(); err != nil {
 		log.Panic(err)
 	}
 
 	// delay exchange and queue
+	// see more about DLX https://www.rabbitmq.com/dlx.html
 	connection.Use(middlewares.ExchangeDeclare(exchangeDelayName, middlewares.ExchangeDirect, nil))
-	argsDelayQueue := make(amqp.Table)
+	argsDelayQueue = make(amqp.Table)
 	argsDelayQueue["x-dead-letter-exchange"] = exchangeName
-	// argsDelayQueue["x-dead-letter-routing-key"] = DLXRoutingKey
 	argsDelayQueue["x-message-ttl"] = delayTime
 	connection.Use(middlewares.QueueDeclare(queueDelayName, argsDelayQueue))
 	connection.Use(middlewares.QueueBind(queueDelayName, "", exchangeDelayName, false, nil))
@@ -81,9 +83,13 @@ func (h *handler) Do(msg []byte) error {
 func (h *handler) OnSuccess(m amqp.Delivery) error {
 	log.Println("consume item success")
 
+	m.Ack(false)
+
 	return nil
 }
 
 func (h *handler) OnError(m amqp.Delivery, err error) {
-	log.Panic("business process error")
+	log.Println("Business process erorr, send item to retry queue")
+
+	m.Reject(false)
 }
